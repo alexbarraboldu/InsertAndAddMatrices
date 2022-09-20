@@ -15,10 +15,10 @@ cImage operator << (cImage const& objA, cImage const& objB)
 	int newImageLength = aux.width * aux.height;
 	aux.image = new bool[newImageLength];
 
+	int objBLength = objB.width * objB.height;
+
 	for (size_t i = 0, j = 0, f = 1, objBf = 0; i < newImageLength; i++)
 	{
-		int objBLength = objB.width * objB.height;
-
 		int p0B = aux.width * (objB.posY + 1 + objBf) - (aux.width - objB.posX);
 		int p1B = (aux.width * (objB.posY + 1 + objBf) - (aux.width - objB.posX)) + (objB.width - 1);
 
@@ -55,27 +55,34 @@ cImage operator + (cImage const& objA, cImage const& objB)
 	int newImageLength = aux.width * aux.height;
 	aux.image = new bool[newImageLength];
 
-	///	TODO
-	///	Hacer la lógica para esta función sin usar otras funciones
-	for (size_t i = 0; i < newImageLength; i++)
+	int objBLength = objB.width * objB.height;
+	int objALength = objA.width * objA.height;
+
+	for (size_t i = 0, j = 0, k = 0, f = 1, objBf = 0, objAf = 0; i < newImageLength; i++)
 	{
-		aux.image[i] = false;
+		int p0B = aux.width * ((objB.posY - posY) + 1 + objBf) - (aux.width - (objB.posX - posX));
+		int p1B = (aux.width * ((objB.posY - posY) + 1 + objBf) - (aux.width - (objB.posX - posX))) + (objB.width - 1);
+
+		int p0A = aux.width * ((objA.posY - posY) + 1 + objAf) - (aux.width - (objA.posX - posX));
+		int p1A = (aux.width * ((objA.posY - posY) + 1 + objAf) - (aux.width - (objA.posX - posX))) + (objA.width - 1);
+
+		if ((i >= p0B && i <= p1B) && j < objBLength)
+		{
+			aux.image[i] = objB.image[j];
+			++j;
+			if (i == p1B) ++objBf;
+		}
+		else if ((i >= p0A && i <= p1A) && k < objALength)
+		{
+			aux.image[i] = objA.image[k];
+			++k;
+			if (i == p1A) ++objAf;
+		}
+		else aux.image[i] = false;
+
+		if (i == (aux.width * f) - 1) ++f;
 	}
 
-	cImage auxObjA = objA;
-	auxObjA.posX -= posX;
-	auxObjA.posY -= posY;
-
-	cImage auxObjB = objB;
-	auxObjB.posX -= posX;
-	auxObjB.posY -= posY;
-
-	///	Esto está mal
-	aux = aux << auxObjA;
-	aux = aux << auxObjB;
-	///------------------
-
-	///	Esto no recuerdo si lo puedo quitar
 	aux.posY = posY;
 	aux.posX = posX;
 
